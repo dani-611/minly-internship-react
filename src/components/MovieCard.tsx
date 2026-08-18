@@ -1,13 +1,5 @@
 import { Card, CardHeader, CardFooter } from "@heroui/react";
-
-type MovieCardProp = {
-  id: number;
-  title: string;
-  posterUrl: string;
-  releaseYear: number;
-  isRecent: boolean;
-  onSelect: (id: number) => void;
-};
+import { type MovieCardProp } from "../types/MovieCardProp";
 
 export const MovieCard = (movieCardProp: MovieCardProp) => {
   return (

@@ -1,18 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MovieInformation } from './MovieInformation';
-
-type MovieDetailsProp = {
-  id: number;
-  title: string;
-  releaseYear: number;
-  posterUrl: string | null;
-  overview: string | null;
-  runtimeMinutes: number | null;
-  trailerUrl: string | null;
-  language: string | null;
-  isRecent: boolean;
-  onBack: () => void;
-};
+import { type MovieDetailsProp } from '../types/MovieDetailsProp';
 
 export const MovieDetails = ({ selectedMovieId, onBack }: { selectedMovieId: number; onBack: () => void }) => {
   const [movie, setMovie] = useState<Omit<MovieDetailsProp, 'onBack'> | null>(null);

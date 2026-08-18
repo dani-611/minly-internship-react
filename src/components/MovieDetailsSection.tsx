@@ -1,11 +1,7 @@
 import { MovieDetails } from './MovieDetails';
+import { type MovieDetailsSectionProp } from '../types/MovieDetailsSectionProp';
 
-interface MovieDetailsSectionProps {
-  movieId: number;
-  setMovieId: (id: number) => void;
-}
-
-export const MovieDetailsSection = ({ movieId, setMovieId }: MovieDetailsSectionProps) => {
+export const MovieDetailsSection = ({ movieId, setMovieId }: MovieDetailsSectionProp) => {
   return (
     <>
       <h2>GET /movies/{movieId}</h2>

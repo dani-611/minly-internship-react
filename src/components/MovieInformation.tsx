@@ -1,17 +1,5 @@
 import { Button } from '@heroui/react';
-
-type MovieDetailsProp = {
-  id: number;
-  title: string;
-  releaseYear: number;
-  posterUrl: string | null;
-  overview: string | null;
-  runtimeMinutes: number | null;
-  trailerUrl: string | null;
-  language: string | null;
-  isRecent: boolean;
-  onBack: () => void;
-};
+import { type MovieDetailsProp } from '../types/MovieDetailsProp';
 
 export const MovieInformation = (movieDetailsProp: MovieDetailsProp) => {
   function formatDate(runtimeMinutes?: number | null) {
