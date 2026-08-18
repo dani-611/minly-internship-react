@@ -1,4 +1,5 @@
-import { Button } from '@heroui/react';
+import { useEffect, useState } from 'react';
+import { MovieInformation } from './MovieInformation';
 
 type MovieDetailsProp = {
   id: number;
@@ -13,53 +14,62 @@ type MovieDetailsProp = {
   onBack: () => void;
 };
 
-export const MovieDetails = (movieDetailsProp: MovieDetailsProp) => {
-  function formatDate(runtimeMinutes?: number | null) {
-    if (!runtimeMinutes) {
-      return 'Duration Not Specified!';
-    }
-    const hour = Math.floor(runtimeMinutes / 60);
-    const minutes = Math.ceil(((runtimeMinutes / 60) - hour) * 60);
-    return hour !== 0 ? (minutes !== 0 ? `${hour}h ${minutes}m` : `${hour}h`) : `${minutes}m`;
-  }
+export const MovieDetails = ({ selectedMovieId, onBack }: { selectedMovieId: number; onBack: () => void }) => {
+  const [movie, setMovie] = useState<Omit<MovieDetailsProp, 'onBack'> | null>(null);
+  const [status, setStatus] = useState<string>("LOADING");
 
-  return (
-    <div className="col-span-full bg-neutral-900 p-6 rounded-2xl flex flex-col md:flex-row gap-6 text-white w-full">
-      {movieDetailsProp.posterUrl && (
-        <img 
-          src={movieDetailsProp.posterUrl} 
-          alt={movieDetailsProp.title} 
-          className="w-full md:w-64 h-96 object-cover rounded-xl shadow-lg shrink-0" 
-        />
-      )}
-      <div className="flex flex-col justify-between flex-1 gap-4">
-        <div>
-          <h2 className="text-3xl font-bold mb-1">{movieDetailsProp.title}</h2>
-          <p className="text-sm text-gray-400 mb-4">
-            {movieDetailsProp.releaseYear} • {formatDate(movieDetailsProp.runtimeMinutes)} • {movieDetailsProp.language?.toUpperCase() || "Language Not Chosen!"}
-          </p>
-          <p className="text-base text-gray-300 leading-relaxed">{movieDetailsProp.overview || "No overview available."}</p>
-          {movieDetailsProp.isRecent && (
-            <span className="inline-block mt-3 bg-red-600 text-xs font-semibold px-2 py-1 rounded">New Release</span>
-          )}
-        </div>
-        <div className="flex gap-4 mt-4">
-          {movieDetailsProp.trailerUrl && (
-            <Button 
-              as="a" 
-              href={movieDetailsProp.trailerUrl || `https://www.google.com/search?q=${encodeURIComponent(movieDetailsProp.title)}+movie+trailer`} 
-              target="_blank" 
-              rel="noreferrer" 
-              color="primary"
-            >
-              Watch Trailer
-            </Button>
-          )}
-          <Button onClick={movieDetailsProp.onBack}>
-            Back to List
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+  useEffect(() => {
+    let isMounted = true;
+
+    async function getMovie() {
+      try {
+        console.log("Fetching single movie...");
+        const response = await fetch(`api/movies/${selectedMovieId}`, { method: 'GET' });
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            console.log("No Movie Found");
+            if (isMounted) setStatus("EMPTY");
+            return;
+          }
+          throw new Error(`Response Status: ${response.status}`);
+        }
+
+        console.log("Converting to JSON");
+        const result = await response.json();
+
+        console.log("Movie Fetched");
+        if (isMounted) {
+          setStatus("DATA");
+          setMovie(result);
+        }
+      } catch (error) {
+        console.error((error as Error).message);
+        if (isMounted) setStatus("ERROR");
+      }
+    }
+
+    getMovie();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedMovieId]);
+
+  useEffect(() => {
+    console.log(status);
+  }, [status]);
+
+  switch (status) {
+    case "LOADING":
+      return <h2 className="text-center w-full text-xl font-semibold my-4">Please wait. We are fetching the movie!</h2>;
+    case "EMPTY":
+      return <h2 className="text-center w-full text-xl font-semibold my-4">Oops! Looks like there is no such movie</h2>;
+    case "ERROR":
+      return <h2 className="text-center w-full text-xl font-semibold my-4">Oh no! Something went wrong</h2>;
+    case "DATA":
+      return movie ? <MovieInformation {...movie} onBack={onBack} /> : null;
+    default:
+      return null;
+  }
 };

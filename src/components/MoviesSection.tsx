@@ -1,11 +1,11 @@
 import { MovieList } from './MovieList';
 
-interface MoviesSectionHeaderProps {
+interface MoviesSectionProps {
   searchQuery: string;
   setMovieId: (id: number) => void;
 }
 
-export const MoviesSectionHeader = ({ searchQuery, setMovieId }: MoviesSectionHeaderProps) => {
+export const MoviesSection = ({ searchQuery, setMovieId }: MoviesSectionProps) => {
   return (
     <>
       <h2>{searchQuery ? `GET /movies?search=${searchQuery}` : 'GET /movies'}</h2>

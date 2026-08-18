@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Header } from '../components/Header';
 import { SearchModule } from '../components/SearchModule';
-import { MoviesSectionHeader } from '../components/MoviesSectionHeader';
-import { MovieDetailsHeader } from '../components/MovieDetailsHeader';
+import { MoviesSection } from '../components/MoviesSection';
+import { MovieDetailsSection } from '../components/MovieDetailsSection';
 
 export const MoviesScreen = () => {
   const [movieId, setMovieId] = useState<number>(NaN);
@@ -29,13 +29,13 @@ export const MoviesScreen = () => {
                 setSearchQuery={setSearchQuery}
                 handleSearchSubmit={handleSearchSubmit}
               />    
-              <MoviesSectionHeader 
+              <MoviesSection
                 searchQuery={searchQuery}
                 setMovieId={setMovieId}
               />   
             </> 
           ) : (
-            <MovieDetailsHeader 
+            <MovieDetailsSection 
               movieId={movieId}
               setMovieId={setMovieId}
             />   
