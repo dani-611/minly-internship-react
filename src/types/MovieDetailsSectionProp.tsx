@@ -1,4 +1,4 @@
-export interface MovieDetailsSectionProp {
+export type MovieDetailsSectionProp = {
   movieId: number;
   setMovieId: (id: number) => void;
 }

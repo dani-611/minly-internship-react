@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react';
 import { MovieCard } from './MovieCard';
+import { ApiStatus } from '../constants/ApiStatus';
+import { type MovieListProp } from '../types/MovieListProp';
 
-
-type MovieListProps = {
-  onSelectMovie: (id: number) => void;
-  searchQuery: string;
-};
-
-export const MovieList = ({ onSelectMovie, searchQuery }: MovieListProps) => {
+export const MovieList = ({ onSelectMovie, searchQuery }: MovieListProp) => {
   const [movies, setMovies] = useState([]);
-  const [status, setStatus] = useState<string>("LOADING");
+  const [status, setStatus] = useState<string>(ApiStatus.LOADING);
+
+  //   const state = useFetch<MovieCardProp[]>('/movies')
+  
+  // if (state.status === 'loading')
+  //   return <Loading />;
+  // if (state.status === 'error')
+  //   return <ErrorState … />;
 
   useEffect(() => {
     let isMounted = true;
@@ -17,7 +20,7 @@ export const MovieList = ({ onSelectMovie, searchQuery }: MovieListProps) => {
     async function getMovies() {
       try {
         console.log("Fetching...");
-        setStatus("LOADING");
+        setStatus(ApiStatus.LOADING);
         const url = searchQuery ? `api/movies?search=${encodeURIComponent(searchQuery)}` : 'api/movies';
         const response = await fetch(url, { method: 'GET' });
 
@@ -33,15 +36,15 @@ export const MovieList = ({ onSelectMovie, searchQuery }: MovieListProps) => {
 
         if (!result || result.length === 0) {
           console.log("Empty Movie List");
-          setStatus("EMPTY");
+          setStatus(ApiStatus.EMPTY);
         } else {
           console.log("Movies Fetched");
-          setStatus("DATA");
+          setStatus(ApiStatus.DATA);
           setMovies(result);
         }
       } catch (error) {
         console.error((error as Error).message);
-        if (isMounted) setStatus("ERROR");
+        if (isMounted) setStatus(ApiStatus.ERROR);
       }
     }
 
@@ -57,13 +60,13 @@ export const MovieList = ({ onSelectMovie, searchQuery }: MovieListProps) => {
   }, [status]);
 
   switch (status) {
-    case "LOADING":
+    case ApiStatus.LOADING:
       return <h2 className="text-center col-span-full text-xl font-semibold my-4">Please wait. We are fetching all movies!</h2>;
-    case "EMPTY":
+    case ApiStatus.EMPTY:
       return <h2 className="text-center col-span-full text-xl font-semibold my-4">Oops! Looks like there are no movies</h2>;
-    case "ERROR":
+    case ApiStatus.ERROR:
       return <h2 className="text-center col-span-full text-xl font-semibold my-4">Oh no! Something went wrong</h2>;
-    case "DATA":
+    case ApiStatus.DATA:
       return (
         <>
           {movies.map((movie: any) => (

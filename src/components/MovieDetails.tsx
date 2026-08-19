@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { MovieInformation } from './MovieInformation';
 import { type MovieDetailsProp } from '../types/MovieDetailsProp';
+import { ApiStatus } from '../constants/ApiStatus';
 
 export const MovieDetails = ({ selectedMovieId, onBack }: { selectedMovieId: number; onBack: () => void }) => {
   const [movie, setMovie] = useState<Omit<MovieDetailsProp, 'onBack'> | null>(null);
-  const [status, setStatus] = useState<string>("LOADING");
+  const [status, setStatus] = useState<string>(ApiStatus.LOADING);
 
   useEffect(() => {
     let isMounted = true;
@@ -17,7 +18,7 @@ export const MovieDetails = ({ selectedMovieId, onBack }: { selectedMovieId: num
         if (!response.ok) {
           if (response.status === 404) {
             console.log("No Movie Found");
-            if (isMounted) setStatus("EMPTY");
+            if (isMounted) setStatus(ApiStatus.EMPTY);
             return;
           }
           throw new Error(`Response Status: ${response.status}`);
@@ -28,12 +29,12 @@ export const MovieDetails = ({ selectedMovieId, onBack }: { selectedMovieId: num
 
         console.log("Movie Fetched");
         if (isMounted) {
-          setStatus("DATA");
+          setStatus(ApiStatus.DATA);
           setMovie(result);
         }
       } catch (error) {
         console.error((error as Error).message);
-        if (isMounted) setStatus("ERROR");
+        if (isMounted) setStatus(ApiStatus.ERROR);
       }
     }
 
@@ -49,13 +50,13 @@ export const MovieDetails = ({ selectedMovieId, onBack }: { selectedMovieId: num
   }, [status]);
 
   switch (status) {
-    case "LOADING":
+    case ApiStatus.LOADING:
       return <h2 className="text-center w-full text-xl font-semibold my-4">Please wait. We are fetching the movie!</h2>;
-    case "EMPTY":
+    case ApiStatus.EMPTY:
       return <h2 className="text-center w-full text-xl font-semibold my-4">Oops! Looks like there is no such movie</h2>;
-    case "ERROR":
+    case ApiStatus.ERROR:
       return <h2 className="text-center w-full text-xl font-semibold my-4">Oh no! Something went wrong</h2>;
-    case "DATA":
+    case ApiStatus.DATA:
       return movie ? <MovieInformation {...movie} onBack={onBack} /> : null;
     default:
       return null;

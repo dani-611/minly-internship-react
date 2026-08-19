@@ -1,11 +1,7 @@
 import { MovieList } from './MovieList';
+import { type MoviesSectionProp } from '../types/MovieSectionProp';
 
-interface MoviesSectionProps {
-  searchQuery: string;
-  setMovieId: (id: number) => void;
-}
-
-export const MoviesSection = ({ searchQuery, setMovieId }: MoviesSectionProps) => {
+export const MoviesSection = ({ searchQuery, setMovieId }: MoviesSectionProp) => {
   return (
     <>
       <h2>{searchQuery ? `GET /movies?search=${searchQuery}` : 'GET /movies'}</h2>

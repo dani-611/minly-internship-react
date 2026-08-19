@@ -3,6 +3,7 @@ import { Header } from '../components/Header';
 import { SearchModule } from '../components/SearchModule';
 import { MoviesSection } from '../components/MoviesSection';
 import { MovieDetailsSection } from '../components/MovieDetailsSection';
+import { Route, Routes } from 'react-router';
 
 export const MoviesScreen = () => {
   const [movieId, setMovieId] = useState<number>(NaN);
@@ -19,6 +20,28 @@ export const MoviesScreen = () => {
   return (
     <>
       <Header />
+      {/* <Routes>
+        <Route path="/" element={
+          <>   
+              <SearchModule 
+                inputValue={inputValue}
+                setInputValue={setInputValue}
+                setSearchQuery={setSearchQuery}
+                handleSearchSubmit={handleSearchSubmit}
+              />    
+              <MoviesSection
+                searchQuery={searchQuery}
+                setMovieId={setMovieId}
+              />   
+          </> 
+        } />
+        <Route path="/movies/:id" element={
+          <MovieDetailsSection 
+              movieId={movieId}
+              setMovieId={setMovieId}
+            /> 
+        } />
+      </Routes> */}
       <section id="next-steps">
         <div id="docs">
           {Number.isNaN(movieId) ? (
