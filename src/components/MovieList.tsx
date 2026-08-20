@@ -1,63 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { MovieCard } from './MovieCard';
+import { useFetch } from '../hooks/useFetch';
 import { ApiStatus } from '../constants/ApiStatus';
-import { type MovieListProp } from '../types/MovieListProp';
+import type { MovieCardProp } from '../types/MovieCardProp';
 
-export const MovieList = ({ onSelectMovie, searchQuery }: MovieListProp) => {
-  const [movies, setMovies] = useState([]);
-  const [status, setStatus] = useState<string>(ApiStatus.LOADING);
+export const MovieList = () => {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
 
-  //   const state = useFetch<MovieCardProp[]>('/movies')
-  
-  // if (state.status === 'loading')
-  //   return <Loading />;
-  // if (state.status === 'error')
-  //   return <ErrorState … />;
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function getMovies() {
-      try {
-        console.log("Fetching...");
-        setStatus(ApiStatus.LOADING);
-        const url = searchQuery ? `api/movies?search=${encodeURIComponent(searchQuery)}` : 'api/movies';
-        const response = await fetch(url, { method: 'GET' });
-
-        if (!response.ok) {
-          console.log("Error Found!");
-          throw new Error(`Response Status: ${response.status}`);
-        }
-
-        console.log("Converting to JSON");
-        const result = await response.json();
-
-        if (!isMounted) return;
-
-        if (!result || result.length === 0) {
-          console.log("Empty Movie List");
-          setStatus(ApiStatus.EMPTY);
-        } else {
-          console.log("Movies Fetched");
-          setStatus(ApiStatus.DATA);
-          setMovies(result);
-        }
-      } catch (error) {
-        console.error((error as Error).message);
-        if (isMounted) setStatus(ApiStatus.ERROR);
-      }
-    }
-
-    getMovies();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [searchQuery]);
-
-  useEffect(() => {
-    console.log(status);
-  }, [status]);
+  const url = searchQuery 
+    ? `api/movies?search=${encodeURIComponent(searchQuery)}` 
+    : 'api/movies';
+    
+  const { status, data: movies } = useFetch<MovieCardProp[]>(url);
 
   switch (status) {
     case ApiStatus.LOADING:
@@ -69,16 +24,8 @@ export const MovieList = ({ onSelectMovie, searchQuery }: MovieListProp) => {
     case ApiStatus.DATA:
       return (
         <>
-          {movies.map((movie: any) => (
-            <MovieCard 
-              key={movie.id} 
-              id={movie.id}
-              title={movie.title}
-              posterUrl={movie.posterUrl}
-              releaseYear={movie.releaseYear}
-              isRecent={movie.isRecent}
-              onSelect={onSelectMovie} 
-            />
+          {movies?.map((movie: MovieCardProp) => (
+            <MovieCard key={movie.id} {...movie}/>
           ))}
         </>
       );

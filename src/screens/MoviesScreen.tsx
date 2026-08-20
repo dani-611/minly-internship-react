@@ -1,68 +1,32 @@
-import React, { useState } from 'react';
+import { Routes, Route, useSearchParams } from 'react-router';
 import { Header } from '../components/Header';
 import { SearchModule } from '../components/SearchModule';
-import { MoviesSection } from '../components/MoviesSection';
+import { MovieList } from '../components/MovieList';
 import { MovieDetailsSection } from '../components/MovieDetailsSection';
-import { Route, Routes } from 'react-router';
 
 export const MoviesScreen = () => {
-  const [movieId, setMovieId] = useState<number>(NaN);
-  const [inputValue, setInputValue] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState<string>("");
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearchQuery(inputValue);
-  };
-
-  console.log("App Rendered");
+  const [searchParams] = useSearchParams();
+  const activeQuery = searchParams.get('search') || '';
 
   return (
     <>
       <Header />
-      {/* <Routes>
-        <Route path="/" element={
-          <>   
-              <SearchModule 
-                inputValue={inputValue}
-                setInputValue={setInputValue}
-                setSearchQuery={setSearchQuery}
-                handleSearchSubmit={handleSearchSubmit}
-              />    
-              <MoviesSection
-                searchQuery={searchQuery}
-                setMovieId={setMovieId}
-              />   
-          </> 
-        } />
-        <Route path="/movies/:id" element={
-          <MovieDetailsSection 
-              movieId={movieId}
-              setMovieId={setMovieId}
-            /> 
-        } />
-      </Routes> */}
       <section id="next-steps">
         <div id="docs">
-          {Number.isNaN(movieId) ? (
-            <>   
-              <SearchModule 
-                inputValue={inputValue}
-                setInputValue={setInputValue}
-                setSearchQuery={setSearchQuery}
-                handleSearchSubmit={handleSearchSubmit}
-              />    
-              <MoviesSection
-                searchQuery={searchQuery}
-                setMovieId={setMovieId}
-              />   
-            </> 
-          ) : (
-            <MovieDetailsSection 
-              movieId={movieId}
-              setMovieId={setMovieId}
-            />   
-          )}
+          <Routes>
+            <Route path="/" element={
+              <>
+                <h2>{activeQuery ? `GET /movies?search=${activeQuery}` : 'GET /movies'}</h2>
+                <p>{activeQuery ? 'searching for movies' : 'Getting all movies'}</p>
+                <SearchModule />
+                <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 p-4 text-left w-full max-w-7xl mx-auto'>
+                  <MovieList />
+                </div>
+              </>
+            } />
+
+            <Route path="/movies/:id" element={<MovieDetailsSection />} />
+          </Routes>
         </div>
       </section>
       <div className="ticks"></div>

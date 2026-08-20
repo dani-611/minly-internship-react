@@ -4,5 +4,4 @@ export type MovieCardProp = {
   posterUrl: string;
   releaseYear: number;
   isRecent: boolean;
-  onSelect: (id: number) => void;
 };

@@ -1,5 +1,5 @@
 import { Button } from '@heroui/react';
-import { type MovieDetailsProp } from '../types/MovieDetailsProp';
+import type { MovieDetailsProp } from '../types/MovieDetailsProp';
 
 export const MovieInformation = (movieDetailsProp: MovieDetailsProp) => {
   function formatDate(runtimeMinutes?: number | null) {
@@ -10,6 +10,8 @@ export const MovieInformation = (movieDetailsProp: MovieDetailsProp) => {
     const minutes = Math.ceil(((runtimeMinutes / 60) - hour) * 60);
     return hour !== 0 ? (minutes !== 0 ? `${hour}h ${minutes}m` : `${hour}h`) : `${minutes}m`;
   }
+
+  const trailerTarget = movieDetailsProp.trailerUrl || `https://google.com{encodeURIComponent(movieDetailsProp.title)}+movie+trailer`;
 
   return (
     <div className="col-span-full bg-neutral-900 p-6 rounded-2xl flex flex-col md:flex-row gap-6 text-white w-full">
@@ -32,17 +34,11 @@ export const MovieInformation = (movieDetailsProp: MovieDetailsProp) => {
           )}
         </div>
         <div className="flex gap-4 mt-4">
-          {movieDetailsProp.trailerUrl && (
-            <Button 
-              as="a" 
-              href={movieDetailsProp.trailerUrl || `https://www.google.com/search?q=${encodeURIComponent(movieDetailsProp.title)}+movie+trailer`} 
-              target="_blank" 
-              rel="noreferrer" 
-              color="primary"
-            >
+          <a href={trailerTarget} target="_blank" rel="noreferrer">
+            <Button variant="primary"> {/* Fixed invalid attribute properties */}
               Watch Trailer
             </Button>
-          )}
+          </a>
           <Button onClick={movieDetailsProp.onBack}>
             Back to List
           </Button>

@@ -1,29 +1,60 @@
-// import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { ApiStatus } from "../constants/ApiStatus";
 
-// type State<T> =
-// | { status: 'loading' }
-// | { status: 'error'; error: Error }
-// | { status: 'ready'; data: T };
+export interface FetchState<T> {
+  status: string; // LOADING | ERROR | EMPTY | DATA
+  data: T | null;
+  error: string | null;
+}
 
-// export function useFetch<T>(url: string): State<T> {
-// const [state, setState] = useState<State<T>>({ status: 'loading' });
-// useEffect(() => { 
-//     const controller = new AbortController();
-//     setState({ status: 'loading' });
+export function useFetch<T>(url: string): FetchState<T> {
+  const [state, setState] = useState<FetchState<T>>({
+    status: ApiStatus.LOADING,
+    data: null,
+    error: null,
+  });
 
-//     fetch(url, { signal: controller.signal })
-//     .then((res) => {
-//         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-//         return res.json();
-//     })
-//     .then((data) => setState({ status: 'ready', data }))
-//     .catch((err) => {
-//         if (err.name !== 'AbortError'){
-//             setState({ status: 'error', error: err });
-//         }
-//     });
+  useEffect(() => {
+    let isCurrent = true;
 
-//     return () => controller.abort();
-//  }, [url]);
-// return state;
-// }
+    async function fetchData() {
+      if (isCurrent) {
+        setState({ status: ApiStatus.LOADING, data: null, error: null });
+      }
+      
+      try {
+        const response = await fetch(url, { method: "GET" });
+        console.log(response);
+        if (!response.ok) {
+          if (response.status === 404) {
+            if (isCurrent) setState({ status: ApiStatus.EMPTY, data: null, error: null });
+            return;
+          }
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log(result)
+        if (!isCurrent) return;
+
+        if (!result || (Array.isArray(result) && result.length === 0)) {
+          setState({ status: ApiStatus.EMPTY, data: null, error: null });
+        } else {
+          setState({ status: ApiStatus.DATA, data: result, error: null });
+        }
+      } catch (err) {
+        if (isCurrent) {
+          setState({ status: ApiStatus.ERROR, data: null, error: (err as Error).message });
+        }
+      }
+    }
+
+    fetchData();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [url]);
+
+  return state;
+}
